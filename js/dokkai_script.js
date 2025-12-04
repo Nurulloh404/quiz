@@ -458,6 +458,8 @@ let time = 0;
 let interval;
 let maxTests = photoTests.length;
 let selectedTests = [];
+let answerLog = [];
+let lastReadingConfig = { count: 15, time: 3600 };
 
 document.addEventListener('DOMContentLoaded', () => {
   const configModal = document.getElementById("configModal");
@@ -466,18 +468,27 @@ document.addEventListener('DOMContentLoaded', () => {
   configModal.style.display = "flex"; // Показать модальное окно
 
   startBtn.addEventListener("click", () => {
-    const questionCount = parseInt(document.getElementById("questionCount").value);
-    time = parseInt(document.getElementById("testTime").value);
-
+    const questionCount = parseInt(document.getElementById("questionCount").value, 10) || maxTests;
+    time = parseInt(document.getElementById("testTime").value, 10) || 3600;
+    lastReadingConfig = { count: questionCount, time };
+    currentIndex = 0;
+    score = 0;
     selectedTests = photoTests.slice(0, questionCount);
+    answerLog = selectedTests.flatMap(test =>
+      test.questions.map(q => ({
+        question: q.text,
+        correct: optionLabel(q.options[q.correct]),
+        selected: null,
+      }))
+    );
     configModal.style.display = "none";
     startTest();
   });
 
   // ✅ Кнопка キャンセル (отмена теста)
-document.getElementById("cancelBtn").addEventListener("click", () => {
-  window.location.href = "index.html";
-});
+  document.getElementById("cancelBtn").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
 
   // Всплывающее окно подтверждения
 
@@ -520,26 +531,35 @@ function showConfirm(message, callback) {
   });
 });
 
-// Светлая - тёмная тема
+// テーマ
+const themeButton = document.getElementById('toggle-theme');
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+  document.body.classList.add('dark-mode');
+  themeButton.textContent = '☀️';
+}
 
-  const themeButton = document.getElementById('toggle-theme');
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+themeButton.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  themeButton.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
 
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.body.classList.add('dark-mode');
-    themeButton.textContent = '☀️';
-  }
+function optionLabel(opt) {
+  return typeof opt === 'string' ? opt : opt?.text || '';
+}
 
-  themeButton.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    themeButton.textContent = isDark ? '☀️' : '🌙';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-
+function questionOffset(testIndex) {
+  return selectedTests.slice(0, testIndex).reduce((sum, test) => sum + test.questions.length, 0);
+}
 
 function startTest() {
+  clearInterval(interval);
+  if (!selectedTests.length) return;
+  document.getElementById("testContainer").innerHTML = "";
+  document.getElementById("timer").textContent = `⏱ ${String(Math.floor(time / 60)).padStart(2, '0')}:${String(time % 60).padStart(2, '0')}`;
   showPhotoTest(currentIndex);
   interval = setInterval(updateTimer, 1000);
 }
@@ -549,6 +569,9 @@ function showPhotoTest(index) {
   container.innerHTML = "";
 
   const test = selectedTests[index];
+  if (!test) return;
+
+  const baseIndex = questionOffset(index);
   const wrapper = document.createElement("div");
   wrapper.className = "question-set";
 
@@ -557,6 +580,8 @@ function showPhotoTest(index) {
   wrapper.appendChild(img);
 
   test.questions.forEach((q, qIndex) => {
+    const globalIndex = baseIndex + qIndex;
+
     const questionEl = document.createElement("div");
     questionEl.className = "question";
     questionEl.innerHTML = `<p>${q.text}</p>`;
@@ -569,6 +594,7 @@ function showPhotoTest(index) {
       btn.textContent = opt;
       btn.onclick = () => {
         const isCorrect = optIndex === q.correct;
+        answerLog[globalIndex].selected = optionLabel(opt);
         if (isCorrect) {
           btn.classList.add("correct");
           score++;
@@ -614,30 +640,65 @@ function updateTimer() {
 
 function finishTest() {
   clearInterval(interval);
-  document.getElementById("testContainer").innerHTML = `
+  if (!selectedTests.length) return;
+  const container = document.getElementById("testContainer");
+  const totalQuestions = selectedTests.reduce((sum, test) => sum + test.questions.length, 0);
+  container.innerHTML = "";
+
+  const summary = document.createElement("div");
+  summary.className = "question-set";
+  summary.innerHTML = `
     <h2>テストが完了しました！</h2>
-    <p>${selectedTests.length * 5} 問中 ${score} 問正解しました。</p>
+    <p>${totalQuestions} 問中 ${score} 問正解しました。</p>
   `;
-}
 
-startTest();
+  const actions = document.createElement("div");
+  actions.className = "retake-row";
+  actions.innerHTML = `
+    <button id="retake-reading" class="secondary">もう一度受ける</button>
+    <button id="return-menu" class="secondary">メニューに戻る</button>
+  `;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const themeButton = document.getElementById('toggle-theme');
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  summary.appendChild(actions);
+  container.appendChild(summary);
 
-  // Установить тему из localStorage или по умолчанию
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.body.classList.add('dark-mode');
-    themeButton.textContent = '☀️'; //☀️ 昼モード//
-  }
+  const reviewGrid = document.createElement("div");
+  reviewGrid.id = "answers-review";
+  reviewGrid.className = "answers-review-grid";
 
-  themeButton.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
+  answerLog.forEach((entry, idx) => {
+    const card = document.createElement("div");
+    card.className = "answer-card";
+    const correctText = entry?.correct || '---';
+    const userText = entry?.selected || '未選択';
+    const isCorrect = correctText === userText;
 
-    themeButton.textContent = isDark ? '☀️' : '🌙'; //'☀️ 昼モード' : '🌙 夜モード'//
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    card.innerHTML = `
+      <h4>${idx + 1}. ${entry?.question || ''}</h4>
+      <p class="answer-meta">正解: ${correctText}</p>
+      <p class="answer-meta" style="color:${isCorrect ? '#16a34a' : '#ef4444'}">あなた: ${userText}</p>
+    `;
+    reviewGrid.appendChild(card);
   });
-});
+
+  container.appendChild(reviewGrid);
+
+  document.getElementById("retake-reading").onclick = () => {
+    currentIndex = 0;
+    score = 0;
+    selectedTests = photoTests.slice(0, lastReadingConfig.count);
+    answerLog = selectedTests.flatMap(test =>
+      test.questions.map(q => ({
+        question: q.text,
+        correct: optionLabel(q.options[q.correct]),
+        selected: null,
+      }))
+    );
+    time = lastReadingConfig.time;
+    startTest();
+  };
+
+  document.getElementById("return-menu").onclick = () => {
+    window.location.href = "index.html";
+  };
+}

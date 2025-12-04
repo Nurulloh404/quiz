@@ -8,13 +8,12 @@
   <link rel="stylesheet" href="./style/dStyle.css">
 </head>
 <body>
-  <div class="header">
-    <div class="wrapper">
-      <!-- <h1 class="moving-text">日本語オンラインテスト： 読解</h1> -->
+  <header>
+    <div class="header">
+      <h1 class="test-title">日本語テスト： 読解</h1>
+      <button id="toggle-theme">☀️</button>
     </div>
-    <p><h1 class="titul">日本語テスト： 読解</h1></p>
-    <button id="toggle-theme" style="margin-left: auto; margin-right: 20px; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">☀️</button> <!--☼-->
-  </div>
+  </header>
   <!-- Меню настроек перед началом теста -->
 <div id="configModal" class="modal">
   <div class="modal-content">
@@ -49,8 +48,10 @@
   
   <div class="bottom-bar">
     <div class="timer" id="timer">⏱ 00:00</div> <!--残り時間:-->
-    <button class="finish-button" id="finishBtn">完了</button>
-    <button id="backToMenuBtn" class="bottom-button left">戻る</button> <!--🏠 メニュー-->
+    <div class="controls-inline">
+      <button id="backToMenuBtn" class="secondary">戻る</button>
+      <button class="finish-button" id="finishBtn">完了</button>
+    </div>
   </div>
 
   <!-- Custom Confirm Modal -->

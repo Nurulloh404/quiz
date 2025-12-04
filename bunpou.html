@@ -10,16 +10,15 @@
 <body>
 <header>
   <div class="header">
-    <div class="wrapper">
-      <!-- <h1 class="moving-text">日本語オンラインテスト： 文法</h1> -->
-    </div>
-    <p><h1 class="test-title">日本語テスト： 文法</h1></p>
-    <button id="toggle-theme" style="margin-left: auto; margin-right: 20px; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">☀️</button> <!--☼-->
+    <h1 id="test-title" class="test-title">日本語テスト： 文法</h1>
+    <button id="toggle-theme">☀️</button>
   </div>
   <div class="bottom-bar">
     <span id="timer">⏱ 00:00</span>
-    <button id="stop_test">完了</button>
-    <button id="back_button">戻る</button>
+    <div class="controls-inline">
+      <button id="back_button" class="secondary">戻る</button>
+      <button id="stop_test">完了</button>
+    </div>
   </div>
 </header>
 
@@ -28,6 +27,9 @@
   <form id="quiz-form"></form>
   <div id="result"></div>
   <div id="answers-review"></div>
+  <div class="retake-row hidden" id="post-actions">
+    <button id="retake-test" class="secondary">もう一度受ける</button>
+  </div>
 </div>
 
 <!-- ✅ Модальное окно: настройка теста -->

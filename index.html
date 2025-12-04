@@ -8,37 +8,35 @@
     <link rel="stylesheet" href="./style/style.css"/>
 </head>
 <body>
-    <script src="./js/script.js"></script>
-    <div class="header">
-      <h1>日本語オンラインテスト</h1>
-      <button id="toggle-theme" style="margin-left: auto; margin-right: 20px; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">☀️</button> <!--☼-->
+  <div class="header">
+    <h1 class="test-title">日本語オンラインテスト</h1>
+    <button id="toggle-theme">☀️</button>
   </div>
-  <div class="choice_container">
-  <form id="start-form"></form>
-      <label id="label_choice" ><p><h3>トピックを選択してください:</h3></p>
-        <select id="select_choice" onchange="window.location.href=this.value;" style="width: 100%; padding: 10px; margin-bottom: 15px;" >
-          <!-- <option class="choice_option1" value="">⊶ トピックを選択 ⊷</option> -->
-          <option class="choice_option1" value="">⊶ N3レベル ⊷</option>
-          <option class="choice_option2" value='goi.html?subject=文字・語彙'>文字・語彙テスト</option>
-          <option class="choice_option1" value='bunpou.html?subject=文法'>文法テスト</option>
-          <option class="choice_option2" value='hoshi_mondai.html?subject=星問題'>星問題テスト</option>
-          <option class="choice_option1" value="dokkai.html">読解テスト</option>
-          <option class="choice_option2" value="shikenIndex.html">試験テスト</option>
-          <!-- <option value='dokkai.html?subject=読解' style="background-color: rgb(209, 209, 209);">読解テスト</option> -->
-        </select>
 
-        <select id="select_choice" onchange="window.location.href=this.value;" style="width: 100%; padding: 10px; margin-bottom: 15px;" >
-          <option class="choice_option1" value="">⊶ N2レベル ⊷</option>
-          <option class="choice_option2" value='n2goi.html?subject=文字・語彙'>文字・語彙テスト</option>
-          <option class="choice_option1" value='n2bunpou.html?subject=文法'>文法テスト</option>
-          <option class="choice_option2" value='n2hoshi_mondai.html?subject=星問題'>星問題テスト</option>
-          <option class="choice_option1" value="n2dokkai.html">読解テスト</option>
-          <option class="choice_option2" value="n2shikenindex.html">試験テスト</option>
-          <!-- <option value='dokkai.html?subject=読解' style="background-color: rgb(209, 209, 209);">読解テスト</option> -->
-        </select>
-      </label>
+  <div class="choice_container">
+    <h3>トピックを選択してください:</h3>
+    <div class="select-group">
+      <select onchange="if(this.value) window.location.href=this.value;">
+        <option value="">⊶ N3レベル ⊷</option>
+        <option value='goi.html?subject=文字・語彙'>文字・語彙テスト</option>
+        <option value='bunpou.html?subject=文法'>文法テスト</option>
+        <option value='hoshi_mondai.html?subject=星問題'>星問題テスト</option>
+        <option value="dokkai.html">読解テスト</option>
+        <option value="shikenIndex.html">試験テスト</option>
+      </select>
+
+      <select onchange="if(this.value) window.location.href=this.value;">
+        <option value="">⊶ N2レベル ⊷</option>
+        <option value='n2goi.html?subject=文字・語彙'>文字・語彙テスト</option>
+        <option value='n2bunpou.html?subject=文法'>文法テスト</option>
+        <option value='n2hoshi_mondai.html?subject=星問題'>星問題テスト</option>
+        <option value="n2dokkai.html">読解テスト</option>
+        <option value="n2shikenindex.html">試験テスト</option>
+      </select>
+    </div>
   </div>
   
   <div id="dim-overlay"></div>
+  <script src="./js/script.js"></script>
 </body>
 </html>
