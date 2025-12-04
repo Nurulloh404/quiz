@@ -513,7 +513,6 @@ a.btn {
 
 .question label.selected-choice {
   border-color: var(--accent);
-  box-shadow: 0 10px 28px rgba(14, 165, 233, 0.25);
   background: rgba(14, 165, 233, 0.08);
 }
 
@@ -523,23 +522,21 @@ a.btn {
 }
 
 .correct-answer {
-  border-color: #22c55e;
-  background: linear-gradient(120deg, rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0.08));
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #ecfdf3;
 }
 
 .correct {
-  border-color: #22c55e;
-  background: linear-gradient(120deg, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0.06));
-}
-
-.correct-answer.correct {
-  box-shadow: 0 8px 22px rgba(34, 197, 94, 0.25);
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #ecfdf3;
 }
 
 .incorrect {
-  border-color: #fb7185;
-  background: linear-gradient(120deg, rgba(251, 113, 133, 0.16), rgba(251, 113, 133, 0.04));
-  color: #ffe4e6;
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #fff1f2;
 }
 
 .result-summary {
