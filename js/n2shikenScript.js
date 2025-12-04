@@ -5,6 +5,7 @@ let currentBlockIndex = 0;
 let timeLeft = 0;
 let timer;
 let startTime;
+let hasSubmitted = false;
 
 // --- ТЕМА: сохранение и переключение ---
 const themeToggle = document.getElementById("themeToggle");
@@ -42,12 +43,14 @@ async function startTest() {
   const name = usernameInput.value.trim();
   if (!name) return alert("名前を入力してください！");
   user.name = name;
+  hasSubmitted = false;
 
   document.getElementById("user-form").classList.add("hidden");
   document.getElementById("test-section").classList.remove("hidden");
+  document.getElementById("footer-actions").classList.remove("hidden");
 
   await loadQuestions();
-  blockKeys = Object.keys(questionsData); // Получаем список блоков
+  blockKeys = Object.keys(questionsData).slice(0, 1); // 2-блокни o‘chirib, faqat birinchi blok
   currentBlockIndex = 0;
   user.blocks = [];
 
@@ -67,9 +70,9 @@ function loadBlock(blockKey) {
   const blockTime = questionsData[blockKey].time ?? 300; // Установка времени (по умолч. 5 мин)
   startTimer(blockTime);
 
-  // Кнопка 次へ / 完了
+  // Single block => всегда 完了
   const finishBtn = document.querySelector("button[onclick='confirmSubmit()']");
-  finishBtn.textContent = currentBlockIndex < blockKeys.length - 1 ? "次へ" : "完了";
+  finishBtn.textContent = "完了";
 }
 
 // --- ТАЙМЕР БЛОКА ---
@@ -143,8 +146,8 @@ function renderAllQuestions(blockKey) {
 
 // --- УНИВЕРСАЛЬНАЯ КНОПКА: 次へ / 完了 ---
 async function confirmSubmit() {
-  const isLastBlock = currentBlockIndex >= blockKeys.length - 1;
-  const confirmText = isLastBlock ? "テストを終了しますか？" : "次のブロックへ進みますか？";
+  if (hasSubmitted) return;
+  const confirmText = "テストを終了しますか？";
   if (await showConfirm(confirmText)) {
     clearInterval(timer);
     handleNext();
@@ -153,14 +156,24 @@ async function confirmSubmit() {
 
 // --- ПЕРЕХОД К СЛЕДУЮЩЕМУ БЛОКУ ИЛИ РЕЗУЛЬТАТЫ ---
 function handleNext() {
+  if (hasSubmitted) return;
   const blockKey = blockKeys[currentBlockIndex];
   const inputs = document.querySelectorAll("input[type=radio]:checked");
   let blockScore = 0;
 
-  inputs.forEach(input => {
-    if (input.value === input.dataset.answer) {
+  const allOptions = document.querySelectorAll("input[type=radio]");
+  allOptions.forEach(input => {
+    const label = input.parentElement;
+    label.classList.remove('correct', 'incorrect', 'correct-answer');
+    const isCorrect = input.value === input.dataset.answer;
+    if (isCorrect) label.classList.add('correct-answer');
+    if (input.checked && isCorrect) {
       blockScore += parseFloat(input.dataset.points);
+      label.classList.add('correct');
+    } else if (input.checked && !isCorrect) {
+      label.classList.add('incorrect');
     }
+    input.disabled = true;
   });
 
   const timeSpent = Math.floor((Date.now() - startTime) / 1000);
@@ -174,17 +187,15 @@ function handleNext() {
   user.score += blockScore;
   currentBlockIndex++;
 
-  if (currentBlockIndex < blockKeys.length) {
-    loadBlock(blockKeys[currentBlockIndex]);
-  } else {
-    showResults();
-  }
+  hasSubmitted = true;
+  showResults();
 }
 
 // --- ВЫВОД ИТОГОВ ВСЕХ БЛОКОВ ---
 function showResults() {
   document.getElementById("test-section").classList.add("hidden");
   document.getElementById("result-section").classList.remove("hidden");
+  document.getElementById("footer-actions").classList.add("hidden");
 
   const resultElem = document.getElementById("score-result");
   let html = `<h3>${user.name}さん、テスト結果:</h3><ul>`;
@@ -216,9 +227,7 @@ async function goToMainMenu() {
 
 // --- ВОЗВРАТ В НАЧАЛО ---
 async function confirmExit() {
-  if (await showConfirm("レジストリ メニューに戻りますか?")) {
-    location.reload();
-  }
+  if (hasSubmitted || await showConfirm("メニューに戻りますか？")) location.reload();
 }
 
 // --- СТАНДАРТНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ---
@@ -255,6 +264,6 @@ function showConfirm(text) {
 // --- СОХРАНЕНИЕ РЕЗУЛЬТАТА ---
 function saveResult() {
   const history = JSON.parse(localStorage.getItem("results") || "[]");
-  history.push({ name: user.name, score: user.score, blocks: user.blocks, date: new Date().toISOString() });
-  localStorage.setItem("results", JSON.stringify(history));
+  history.unshift({ name: user.name, score: user.score, blocks: user.blocks, date: new Date().toISOString() });
+  localStorage.setItem("results", JSON.stringify(history.slice(0, 50)));
 }

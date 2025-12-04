@@ -4,43 +4,62 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="./logo/ssr_logo.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>試験テスト</title>
+  <title>N2 試験テスト</title>
   <link rel="stylesheet" href="./style/shikenStyle.css" />
 </head>
-<body class="light">
-
-  <header>
-    <h1 class="moving-text">日本語の力試験</h1>
-    <button id="themeToggle" style="margin-left: auto; margin-right: 20px; padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;">☀️</button> <!--☼-->
-  </header>
-    <main class="container" id="user-form" style="position: relative; min-height: 160px;">
-      <h2>データを入力</h2>
-      <input type="text" id="username" placeholder="  名前" />
-
-      <button onclick="goToMainMenu()" class="bottom-left">メニューに戻る</button>
-      <button id="startButton" onclick="startTest()" class="bottom-right">テストを開始する</button>
-    </main>
-    <main class="container hidden" id="test-section">
-    <form id="test-form"></form>
-    <div class="footer">
-      <button onclick="confirmExit()">戻る</button>
-      <div id="timer">⏱ <span id="time">00:00</span></div>
-      <button type="button" onclick="confirmSubmit()">完了</button>
+<body>
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">N2 Trial</span>
+      <h1 class="test-title">日本語の力試験</h1>
     </div>
+    <div class="header-actions">
+      <a class="pill-link" href="index.html">ホーム</a>
+      <a class="pill-link" href="mypage.html">My Page</a>
+      <button id="themeToggle">☀️</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="card" id="user-form">
+      <h2>データを入力</h2>
+      <p class="muted">名前を入力するとテストを開始できます。</p>
+      <input type="text" id="username" placeholder="お名前" />
+      <div class="button-row">
+        <button class="ghost" onclick="goToMainMenu()" type="button">メニュー</button>
+        <button id="startButton" onclick="startTest()" type="button">テスト開始</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="test-section">
+      <form id="test-form"></form>
+    </section>
+
+    <section class="card hidden" id="result-section">
+      <h2>結果</h2>
+      <p id="score-result"></p>
+      <div class="button-row">
+        <button class="ghost" onclick="location.reload()" type="button">もう一度</button>
+        <button onclick="goToMainMenu()" type="button">メニュー</button>
+      </div>
+    </section>
   </main>
 
-  <main class="container hidden" id="result-section">
-    <h2>結果</h2>
-    <p id="score-result"></p>
-    <button onclick="location.reload()">テストを再度開始する</button>
-  </main>
+  <footer class="cta-bar hidden" id="footer-actions">
+    <button onclick="confirmExit()" class="ghost">戻る</button>
+    <div id="timer">⏱ <span id="time">00:00</span></div>
+    <button type="button" onclick="confirmSubmit()">完了</button>
+  </footer>
+
   <div id="confirm-modal" class="modal-overlay hidden">
-  <div class="modal-content">
-    <p id="confirm-text">メッセージ</p>
-    <button id="confirm-yes">はい</button>
-    <button id="confirm-no">いいえ</button>
+    <div class="modal-content">
+      <p id="confirm-text">メッセージ</p>
+      <div class="button-row">
+        <button id="confirm-yes">はい</button>
+        <button id="confirm-no" class="ghost">いいえ</button>
+      </div>
+    </div>
   </div>
-</div>
   <script src="./js/n2shikenScript.js"></script>
 </body>
 </html>
