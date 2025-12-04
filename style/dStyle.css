@@ -55,15 +55,15 @@ body {
 }
 
 .answers button.correct {
-  background: #ecfdf3;
-  border-color: #22c55e;
-  color: #166534;
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ecfdf3 !important;
 }
 
 .answers button.incorrect {
-  background: #fef2f2;
-  border-color: #fca5a5;
-  color: #b91c1c;
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #fff1f2 !important;
 }
 
 .answers button:disabled {

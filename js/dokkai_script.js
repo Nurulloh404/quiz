@@ -593,6 +593,7 @@ function showPhotoTest(index) {
       const btn = document.createElement("button");
       btn.textContent = opt;
       btn.onclick = () => {
+        if ([...answersEl.children].some(b => b.disabled)) return;
         const isCorrect = optIndex === q.correct;
         answerLog[globalIndex].selected = optionLabel(opt);
         if (isCorrect) {
