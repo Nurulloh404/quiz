@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="./logo/ssr_logo.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Page | Quiz statistikasi</title>
+  <link rel="stylesheet" href="./style/style.css" />
+</head>
+<body>
+  <header>
+    <div class="header">
+      <div>
+        <span class="eyebrow">My Page</span>
+        <h1 class="test-title">Natijalar va statistikalar</h1>
+      </div>
+      <div class="header-actions">
+        <a class="pill-link" href="index.html">ホーム</a>
+        <button id="toggle-theme">☀️</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="landing">
+    <section class="hero">
+      <span class="eyebrow">Progress tracker</span>
+      <h1>Sizning o‘sish xaritangiz</h1>
+      <p>Har bir yakunlangan test shu yerda saqlanadi. To‘g‘ri/noto‘g‘ri ko‘rsatkichlarini ko‘rib, keyingi qadamlaringizni rejalashtiring.</p>
+      <div class="hero-actions">
+        <button class="btn secondary" id="clear-stats">Arxivni tozalash</button>
+        <a class="btn ghost" href="index.html">Testlarni tanlash</a>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stats-card">
+        <h4>Testlar soni</h4>
+        <p class="result-strong" id="stat-total">0</p>
+        <p class="muted">Yakunlangan sinovlar</p>
+      </div>
+      <div class="stats-card">
+        <h4>O‘rtacha aniqlik</h4>
+        <p class="result-strong" id="stat-avg">0%</p>
+        <p class="muted">Jami urinishlar bo‘yicha</p>
+      </div>
+      <div class="stats-card">
+        <h4>Eng yaxshi natija</h4>
+        <p class="result-strong" id="stat-best">0%</p>
+        <p class="muted">To‘g‘ri javoblar ulushi</p>
+      </div>
+      <div class="stats-card">
+        <h4>O‘rtacha vaqt</h4>
+        <p class="result-strong" id="stat-duration">00:00</p>
+        <p class="muted">Bir testga sarflangan</p>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="table-card__header">
+        <h3>Yakunlangan testlar</h3>
+        <p class="muted" id="subtitle-count"></p>
+      </div>
+      <div id="table-container"></div>
+    </section>
+  </main>
+
+  <script src="./js/mypage.js"></script>
+</body>
+</html>

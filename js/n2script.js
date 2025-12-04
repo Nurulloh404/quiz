@@ -1,4 +1,5 @@
 const QUESTION_FILE = './json/n2questions.json';
+const LEVEL = 'N2';
 const params = new URLSearchParams(window.location.search);
 const subject = params.get('subject') || '文法';
 
@@ -8,12 +9,20 @@ let timer;
 let timeLeft = 3600;
 let userAnswers = [];
 let lastConfig = { count: 20, time: 60 };
+let testStartedAt = null;
+let liveCorrect = 0;
+let liveIncorrect = 0;
+let questionStatus = [];
 
 const startModal = document.getElementById('start-settings-modal');
 const resultBox = document.getElementById('result');
 const answersReview = document.getElementById('answers-review');
 const retakeButton = document.getElementById('retake-test');
 const postActions = document.getElementById('post-actions');
+const liveFooter = document.getElementById('live-footer');
+const liveCorrectElem = document.getElementById('live-correct');
+const liveIncorrectElem = document.getElementById('live-incorrect');
+const liveRemainingElem = document.getElementById('live-remaining');
 
 // 初期設定
 window.onload = () => {
@@ -57,10 +66,17 @@ retakeButton?.addEventListener('click', () => {
   beginTest(lastConfig);
 });
 
+document.getElementById('view-stats-btn')?.addEventListener('click', () => {
+  window.location.href = 'mypage.html';
+});
+
+document.getElementById('questions-container')?.addEventListener('change', handleOptionSelect);
+
 // Вопросы
 function displayQuestions() {
   const container = document.getElementById('questions-container');
   container.innerHTML = '';
+  questionStatus = [];
 
   questions.forEach((q, index) => {
     const div = document.createElement('div');
@@ -102,8 +118,13 @@ async function beginTest(config) {
   const pool = data[subject] || [];
   questions = shuffleArray([...pool]).slice(0, config.count);
   timeLeft = config.time * 60;
+  testStartedAt = Date.now();
+  liveCorrect = 0;
+  liveIncorrect = 0;
 
   displayQuestions();
+  questionStatus = Array(questions.length).fill(null);
+  updateLiveFooter();
   startTimer();
   if (startModal) startModal.style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -122,6 +143,7 @@ function resetUI() {
   resultBox.innerHTML = '';
   answersReview.innerHTML = '';
   postActions?.classList.add('hidden');
+  liveFooter?.classList.remove('hidden');
 }
 
 // Таймер
@@ -190,7 +212,7 @@ if (cancelBtn) {
 function submitTest() {
   clearInterval(timer);
   const allQuestions = document.querySelectorAll('.question');
-  let correctCount = 0;
+  let correctCount = questionStatus.filter(status => status === 'correct').length;
   userAnswers = [];
 
   questions.forEach((q, i) => {
@@ -203,9 +225,9 @@ function submitTest() {
       const optIndex = parseInt(opt.value, 10);
       const label = opt.parentElement;
 
+      if (opt.checked) label.classList.add('selected-choice');
       if (optIndex === q.answer) label.classList.add('correct-answer');
       if (opt.checked && optIndex === q.answer) {
-        correctCount++;
         label.classList.add('correct');
       } else if (opt.checked && optIndex !== q.answer) {
         label.classList.add('incorrect');
@@ -215,14 +237,13 @@ function submitTest() {
     });
   });
 
-  const result = document.createElement('div');
-  result.className = 'result-summary';
-  result.innerHTML = `正解: ${questions.length} 点中 ${correctCount}点`;
-  resultBox.innerHTML = '';
-  resultBox.appendChild(result);
-
+  const durationSec = getDurationSeconds();
+  const accuracy = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+  renderResultSummary(correctCount, accuracy, durationSec);
   renderAnswerReview();
+  saveResult(correctCount, accuracy, durationSec);
   postActions?.classList.remove('hidden');
+  liveFooter?.classList.add('hidden');
 }
 
 function renderAnswerReview() {
@@ -234,13 +255,109 @@ function renderAnswerReview() {
     const isCorrect = userChoice === q.answer;
 
     card.innerHTML = `
-      <h4>${index + 1}. ${q.question}</h4>
+      <div class="answer-card__header">
+        <h4>${index + 1}. ${q.question}</h4>
+        <span class="pill ${isCorrect ? 'pill--success' : 'pill--danger'}">${isCorrect ? '正解' : '間違い'}</span>
+      </div>
       <p class="answer-meta">正解: ${formatOption(q.options[q.answer])}</p>
-      <p class="answer-meta" style="color:${isCorrect ? '#16a34a' : '#ef4444'}">
+      <p class="answer-meta ${isCorrect ? 'text-success' : 'text-danger'}">
         あなた: ${userChoice >= 0 ? formatOption(q.options[userChoice]) : '未選択'}
       </p>
     `;
 
     answersReview.appendChild(card);
   });
+}
+
+function renderResultSummary(correctCount, accuracy, durationSec) {
+  const result = document.createElement('div');
+  result.className = 'result-summary';
+  result.innerHTML = `
+    <div class="score-badge">${correctCount}<span>/ ${questions.length}</span></div>
+    <div class="result-meta">
+      <div>
+        <p class="muted">正解率</p>
+        <p class="result-strong">${accuracy}%</p>
+      </div>
+      <div>
+        <p class="muted">所要時間</p>
+        <p class="result-strong">${formatDuration(durationSec)}</p>
+      </div>
+    </div>
+  `;
+  resultBox.innerHTML = '';
+  resultBox.appendChild(result);
+}
+
+function getDurationSeconds() {
+  if (!testStartedAt) return 0;
+  const elapsed = Math.floor((Date.now() - testStartedAt) / 1000);
+  return Math.min(elapsed, (lastConfig.time || 0) * 60);
+}
+
+function formatDuration(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function saveResult(correctCount, accuracy, durationSec) {
+  const payload = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : `result-${Date.now()}`),
+    level: LEVEL,
+    subject,
+    correct: correctCount,
+    total: questions.length,
+    accuracy,
+    durationSec,
+    timeLimitSec: (lastConfig.time || 0) * 60,
+    startedAt: testStartedAt ? new Date(testStartedAt).toISOString() : null,
+    finishedAt: new Date().toISOString(),
+    page: window.location.pathname.split('/').pop()
+  };
+
+  const existing = JSON.parse(localStorage.getItem('quizResults') || '[]');
+  existing.unshift(payload);
+  const trimmed = existing.slice(0, 50);
+  localStorage.setItem('quizResults', JSON.stringify(trimmed));
+}
+
+function handleOptionSelect(event) {
+  const target = event.target;
+  if (!target.matches('input[type="radio"][name^="q"]')) return;
+  const name = target.name;
+  const qIndex = parseInt(name.replace('q', ''), 10);
+  if (Number.isNaN(qIndex) || questionStatus[qIndex]) return;
+
+  const selectedIndex = parseInt(target.value, 10);
+  const q = questions[qIndex];
+  if (!q) return;
+
+  const questionEl = document.querySelectorAll('.question')[qIndex];
+  const options = questionEl.querySelectorAll('input[type=radio]');
+  const isCorrect = selectedIndex === q.answer;
+
+  questionStatus[qIndex] = isCorrect ? 'correct' : 'incorrect';
+  if (isCorrect) liveCorrect++; else liveIncorrect++;
+  updateLiveFooter();
+
+  options.forEach(opt => {
+    const optIndex = parseInt(opt.value, 10);
+    const label = opt.parentElement;
+    label.classList.remove('selected-choice', 'correct', 'incorrect');
+    if (optIndex === q.answer) label.classList.add('correct-answer');
+    if (opt.checked && optIndex === q.answer) {
+      label.classList.add('correct');
+    } else if (opt.checked && optIndex !== q.answer) {
+      label.classList.add('incorrect');
+    }
+    opt.disabled = true;
+  });
+}
+
+function updateLiveFooter() {
+  const remaining = questions.length - (liveCorrect + liveIncorrect);
+  if (liveCorrectElem) liveCorrectElem.textContent = liveCorrect;
+  if (liveIncorrectElem) liveIncorrectElem.textContent = liveIncorrect;
+  if (liveRemainingElem) liveRemainingElem.textContent = remaining;
 }

@@ -5,37 +5,81 @@
     <link rel="icon" href="./logo/ssr_logo.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日本語の期末試験</title>
-    <link rel="stylesheet" href="./style/style.css"/>
+<link rel="stylesheet" href="./style/style.css"/>
 </head>
 <body>
-  <div class="header">
-    <h1 class="test-title">日本語オンラインテスト</h1>
-    <button id="toggle-theme">☀️</button>
-  </div>
-
-  <div class="choice_container">
-    <h3>トピックを選択してください:</h3>
-    <div class="select-group">
-      <select onchange="if(this.value) window.location.href=this.value;">
-        <option value="">⊶ N3レベル ⊷</option>
-        <option value='goi.html?subject=文字・語彙'>文字・語彙テスト</option>
-        <option value='bunpou.html?subject=文法'>文法テスト</option>
-        <option value='hoshi_mondai.html?subject=星問題'>星問題テスト</option>
-        <option value="dokkai.html">読解テスト</option>
-        <option value="shikenIndex.html">試験テスト</option>
-      </select>
-
-      <select onchange="if(this.value) window.location.href=this.value;">
-        <option value="">⊶ N2レベル ⊷</option>
-        <option value='n2goi.html?subject=文字・語彙'>文字・語彙テスト</option>
-        <option value='n2bunpou.html?subject=文法'>文法テスト</option>
-        <option value='n2hoshi_mondai.html?subject=星問題'>星問題テスト</option>
-        <option value="n2dokkai.html">読解テスト</option>
-        <option value="n2shikenindex.html">試験テスト</option>
-      </select>
+  <header>
+    <div class="header">
+      <div>
+        <span class="eyebrow">JLPT Skill Sprint</span>
+        <h1 class="test-title">日本語オンラインテスト</h1>
+      </div>
+      <div class="header-actions">
+        <a class="pill-link" href="mypage.html">My Page</a>
+        <button id="toggle-theme">☀️</button>
+      </div>
     </div>
-  </div>
-  
+  </header>
+
+  <main class="landing">
+    <section class="hero">
+      <span class="eyebrow">Fresh Look</span>
+      <h1>Onlayn quiz bilan zamonaviy usulda tayyorlaning</h1>
+      <p>Natijalaringizni kuzating, to'g'ri javoblarni bir zumda ko'ring va My Page-da to'liq statistika bilan ishlang.</p>
+      <div class="hero-actions">
+        <a class="btn" href="goi.html?subject=文字・語彙">Tez boshlash</a>
+        <a class="btn secondary" href="mypage.html">Statistikalar</a>
+        <a class="btn ghost" href="shikenIndex.html">Full Test</a>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric">
+          <strong>N3 / N2</strong>
+          <small>Har ikki daraja uchun bloklar</small>
+        </div>
+        <div class="metric">
+          <strong>リアルタイム</strong>
+          <small>To'g'ri / noto'g'ri ranglar</small>
+        </div>
+        <div class="metric">
+          <strong>My Page</strong>
+          <small>Saqlangan tarix va ko'rsatkichlar</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="level-grid">
+      <article class="level-card">
+        <h3>⊶ N3レベル ⊷</h3>
+        <small>Asosiy tayyorgarlikni shu yerdan boshlang</small>
+        <div class="select-group">
+          <select onchange="if(this.value) window.location.href=this.value;">
+            <option value="">Test turini tanlang</option>
+            <option value='goi.html?subject=文字・語彙'>文字・語彙テスト</option>
+            <option value='bunpou.html?subject=文法'>文法テスト</option>
+            <option value='hoshi_mondai.html?subject=星問題'>星問題テスト</option>
+            <option value="dokkai.html">読解テスト</option>
+            <option value="shikenIndex.html">試験テスト</option>
+          </select>
+        </div>
+      </article>
+
+      <article class="level-card">
+        <h3>⊶ N2レベル ⊷</h3>
+        <small>Murakkab savollar va vaqt boshqaruvi</small>
+        <div class="select-group">
+          <select onchange="if(this.value) window.location.href=this.value;">
+            <option value="">Test turini tanlang</option>
+            <option value='n2goi.html?subject=文字・語彙'>文字・語彙テスト</option>
+            <option value='n2bunpou.html?subject=文法'>文法テスト</option>
+            <option value='n2hoshi_mondai.html?subject=星問題'>星問題テスト</option>
+            <option value="n2dokkai.html">読解テスト</option>
+            <option value="n2shikenindex.html">試験テスト</option>
+          </select>
+        </div>
+      </article>
+    </section>
+  </main>
+
   <div id="dim-overlay"></div>
   <script src="./js/script.js"></script>
 </body>

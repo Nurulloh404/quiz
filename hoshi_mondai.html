@@ -11,7 +11,11 @@
 <header>
   <div class="header">
     <h1 id="test-title" class="test-title">日本語オンラインテスト： 星問題</h1>
-    <button id="toggle-theme">☀️</button>
+    <div class="header-actions">
+      <a class="pill-link" href="index.html">ホーム</a>
+      <a class="pill-link" href="mypage.html">My Page</a>
+      <button id="toggle-theme">☀️</button>
+    </div>
   </div>
   <div class="bottom-bar">
     <span id="timer">⏱ 00:00</span> <!--残り時間:-->
@@ -23,14 +27,24 @@
 </header>
 
 <div class="container">
+  <div class="page-intro">
+    <p class="muted">正解は緑、誤答は赤で表示され、履歴は My Page で確認できます。</p>
+  </div>
   <main id="questions-container"></main>
   <form id="quiz-form"></form>
   <div id="result"></div>
   <div id="answers-review"></div>
   <div class="retake-row hidden" id="post-actions">
     <button id="retake-test" class="secondary">もう一度受ける</button>
+    <button id="view-stats-btn" class="btn ghost">My Page</button>
   </div>
 </div>
+
+<footer id="live-footer" class="live-footer">
+  <div>✅ <span id="live-correct">0</span></div>
+  <div>❌ <span id="live-incorrect">0</span></div>
+  <div>⏳ <span id="live-remaining">0</span></div>
+</footer>
 
 <!-- ✅ Модальное окно: настройка теста -->
 <div id="start-settings-modal" class="modal-overlay">
