@@ -236,8 +236,8 @@ function submitTest() {
 
   const durationSec = getDurationSeconds();
   const accuracy = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
-  renderResultSummary(correctCount, accuracy, durationSec);
-  renderAnswerReview();
+  resultBox.innerHTML = '';
+  answersReview.innerHTML = '';
   saveResult(correctCount, accuracy, durationSec);
   postActions?.classList.remove('hidden');
   liveFooter?.classList.add('hidden');
