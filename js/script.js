@@ -1,24 +1,57 @@
 let questions = [];
-let timer;
-let timeLeft = 3600;
+let timer = null;
+let timeLeft = 0;
 let userAnswers = [];
 let subject = null;
 
-// URL パラメータ取得
 const params = new URLSearchParams(window.location.search);
-subject = params.get('subject') || "文法";
+subject = params.get('subject') || '文法';
 
-// 初期ダイアログ設定
-window.onload = () => {
-  document.getElementById("start-settings-modal").style.display = "flex";
-  document.getElementById("test-title").textContent = "日本語オンラインテスト： " + subject;
+const elements = {
+  startModal: document.getElementById('start-settings-modal'),
+  startBtn: document.getElementById('start-test-btn'),
+  cancelBtn: document.getElementById('cancel-test-btn'),
+  questionCount: document.getElementById('question-count'),
+  timeLimit: document.getElementById('time-limit'),
+  questionsContainer: document.getElementById('questions-container'),
+  timerDisplay: document.getElementById('timer'),
+  resultBox: document.getElementById('result'),
+  testTitle: document.getElementById('test-title') || document.querySelector('.test-title'),
+  stopBtn: document.getElementById('stop_test'),
+  backBtn: document.getElementById('back_button'),
+  confirmEndModal: document.getElementById('confirm-end-modal'),
+  confirmEndYes: document.getElementById('confirm-end-yes'),
+  confirmEndNo: document.getElementById('confirm-end-no'),
+  confirmExitModal: document.getElementById('confirm-exit-modal'),
+  confirmExitYes: document.getElementById('confirm-exit-yes'),
+  confirmExitNo: document.getElementById('confirm-exit-no'),
 };
 
-// テーマ切り替え
-document.addEventListener('DOMContentLoaded', () => {
+const retakeButton = elements.resultBox ? document.createElement('button') : null;
+if (retakeButton) {
+  retakeButton.id = 'retake-test';
+  retakeButton.textContent = 'テストをやり直す';
+}
+
+window.addEventListener('load', () => {
+  if (elements.startModal) {
+    elements.startModal.style.display = 'flex';
+  }
+  if (elements.testTitle && subject) {
+    elements.testTitle.textContent = `日本語テスト： ${subject}`;
+  }
+  setupThemeToggle();
+  bindStartFlow();
+  bindConfirmationModals();
+  resetViewForNewRun();
+});
+
+function setupThemeToggle() {
   const themeButton = document.getElementById('toggle-theme');
   const savedTheme = localStorage.getItem('theme');
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (!themeButton) return;
 
   if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
     document.body.classList.add('dark-mode');
@@ -31,28 +64,105 @@ document.addEventListener('DOMContentLoaded', () => {
     themeButton.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
-});
+}
 
-// Начало теста
-document.getElementById("start-test-btn").addEventListener("click", () => {
-  const count = parseInt(document.getElementById("question-count").value) || 20;
-  const time = parseInt(document.getElementById("time-limit").value) || 60;
-  timeLeft = time * 60;
-
-  fetch('./json/questions.json')
-    .then(res => res.json())
-    .then(data => {
-      questions = shuffleArray(data[subject] || []).slice(0, count);
-      displayQuestions();
-      startTimer();
-      document.getElementById("start-settings-modal").style.display = "none";
+function bindStartFlow() {
+  if (elements.startBtn) {
+    elements.startBtn.addEventListener('click', () => {
+      resetViewForNewRun();
+      const count = parseInt(elements.questionCount?.value, 10) || 20;
+      const timeMinutes = parseInt(elements.timeLimit?.value, 10) || 60;
+      timeLeft = timeMinutes * 60;
+      fetch('./json/questions.json')
+        .then(res => res.json())
+        .then(data => {
+          questions = shuffleArray(data[subject] || []).slice(0, count);
+          displayQuestions();
+          startTimer();
+          if (elements.startModal) elements.startModal.style.display = 'none';
+        });
     });
-});
+  }
 
-// Вопросы
+  if (elements.cancelBtn) {
+    elements.cancelBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  }
+
+  if (retakeButton) {
+    retakeButton.addEventListener('click', () => {
+      if (elements.startModal) {
+        elements.startModal.style.display = 'flex';
+      } else {
+        window.location.reload();
+      }
+      resetViewForNewRun();
+    });
+  }
+}
+
+function bindConfirmationModals() {
+  if (elements.stopBtn && elements.confirmEndModal) {
+    elements.stopBtn.addEventListener('click', () => {
+      elements.confirmEndModal.style.display = 'flex';
+    });
+  }
+
+  if (elements.confirmEndYes && elements.confirmEndModal) {
+    elements.confirmEndYes.addEventListener('click', () => {
+      elements.confirmEndModal.style.display = 'none';
+      submitTest();
+    });
+  }
+
+  if (elements.confirmEndNo && elements.confirmEndModal) {
+    elements.confirmEndNo.addEventListener('click', () => {
+      elements.confirmEndModal.style.display = 'none';
+    });
+  }
+
+  if (elements.backBtn && elements.confirmExitModal) {
+    elements.backBtn.addEventListener('click', () => {
+      elements.confirmExitModal.style.display = 'flex';
+    });
+  }
+
+  if (elements.confirmExitYes) {
+    elements.confirmExitYes.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  }
+
+  if (elements.confirmExitNo && elements.confirmExitModal) {
+    elements.confirmExitNo.addEventListener('click', () => {
+      elements.confirmExitModal.style.display = 'none';
+    });
+  }
+}
+
+function resetViewForNewRun() {
+  clearInterval(timer);
+  timer = null;
+  userAnswers = [];
+  questions = [];
+
+  if (elements.questionsContainer) {
+    elements.questionsContainer.innerHTML = '';
+  }
+
+  if (elements.resultBox) {
+    elements.resultBox.innerHTML = '';
+  }
+
+  if (elements.timerDisplay) {
+    elements.timerDisplay.textContent = '⏱ --:--';
+  }
+}
+
 function displayQuestions() {
-  const container = document.getElementById("questions-container");
-  container.innerHTML = '';
+  if (!elements.questionsContainer) return;
+  elements.questionsContainer.innerHTML = '';
 
   questions.forEach((q, index) => {
     const div = document.createElement('div');
@@ -60,34 +170,32 @@ function displayQuestions() {
     let html = `<p><strong>${index + 1}. ${q.question}</strong></p>`;
 
     if (q.image) {
-      html += `<img src="${q.image}" alt="question image" style="max-width: 300px;"><br>`;
+      html += `<img src="${q.image}" alt="question image"><br>`;
     }
 
-    const options = shuffleArray(q.options.map((opt, i) =>
+    const options = shuffleArray((q.options || []).map((opt, i) =>
       typeof opt === 'string' ? { text: opt, index: i } : { ...opt, index: i }
     ));
 
     options.forEach(opt => {
-      const id = `q${index}_o${opt.index}`;
       html += `<label><input type="radio" name="q${index}" value="${opt.index}">`;
       html += opt.image
-        ? ` <img src="${opt.image}" alt="option image" style="max-width: 150px;">`
+        ? ` <img src="${opt.image}" alt="option image">`
         : ` ${opt.text}`;
       html += `</label><br>`;
     });
 
     div.innerHTML = html;
-    container.appendChild(div);
+    elements.questionsContainer.appendChild(div);
   });
 }
 
-// Таймер
 function startTimer() {
-  const timerElem = document.getElementById("timer");
+  if (!elements.timerDisplay) return;
+  elements.timerDisplay.textContent = `⏱ ${formatTime(timeLeft)}`;
+  clearInterval(timer);
   timer = setInterval(() => {
-    const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-    const seconds = String(timeLeft % 60).padStart(2, '0');
-    timerElem.textContent = `⏱ ${minutes}:${seconds}`;
+    elements.timerDisplay.textContent = `⏱ ${formatTime(timeLeft)}`;
     if (--timeLeft < 0) {
       clearInterval(timer);
       submitTest();
@@ -95,44 +203,16 @@ function startTimer() {
   }, 1000);
 }
 
-// Перемешивание
-function shuffleArray(arr) {
-  return arr.sort(() => Math.random() - 0.5);
+function formatTime(totalSeconds) {
+  const minutes = String(Math.max(0, Math.floor(totalSeconds / 60))).padStart(2, '0');
+  const seconds = String(Math.max(0, totalSeconds % 60)).padStart(2, '0');
+  return `${minutes}:${seconds}`;
 }
 
-// Подтверждение завершения
-document.getElementById("stop_test").addEventListener("click", () => {
-  document.getElementById("confirm-end-modal").style.display = "flex";
-});
+function shuffleArray(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
 
-document.getElementById("confirm-end-yes").addEventListener("click", () => {
-  document.getElementById("confirm-end-modal").style.display = "none";
-  submitTest();
-});
-
-document.getElementById("confirm-end-no").addEventListener("click", () => {
-  document.getElementById("confirm-end-modal").style.display = "none";
-});
-
-// Подтверждение выхода
-document.getElementById("back_button").addEventListener("click", () => {
-  document.getElementById("confirm-exit-modal").style.display = "flex";
-});
-
-document.getElementById("confirm-exit-yes").addEventListener("click", () => {
-  window.location.href = 'index.html';
-});
-
-document.getElementById("confirm-exit-no").addEventListener("click", () => {
-  document.getElementById("confirm-exit-modal").style.display = "none";
-});
-
-// ✅ Кнопка キャンセル (отмена теста)
-document.getElementById("cancel-test-btn").addEventListener("click", () => {
-  window.location.href = "index.html";
-});
-
-// Проверка
 function submitTest() {
   clearInterval(timer);
   const allQuestions = document.querySelectorAll('.question');
@@ -141,12 +221,12 @@ function submitTest() {
 
   questions.forEach((q, i) => {
     const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    const selectedIndex = selected ? parseInt(selected.value) : -1;
+    const selectedIndex = selected ? parseInt(selected.value, 10) : -1;
     userAnswers.push(selectedIndex);
 
-    const options = allQuestions[i].querySelectorAll('input[type=radio]');
+    const options = allQuestions[i]?.querySelectorAll('input[type=radio]') || [];
     options.forEach(opt => {
-      const optIndex = parseInt(opt.value);
+      const optIndex = parseInt(opt.value, 10);
       const label = opt.parentElement;
 
       if (optIndex === q.answer) label.classList.add('correct-answer');
@@ -161,7 +241,20 @@ function submitTest() {
     });
   });
 
-  const result = document.createElement('p');
-  result.innerHTML = `<strong>正解: ${questions.length} 点中 ${correctCount}点</strong>`;
-  document.getElementById("questions-container").appendChild(result);
+  showResult(correctCount);
+}
+
+function showResult(correctCount) {
+  if (!elements.resultBox) return;
+
+  const score = document.createElement('div');
+  score.className = 'result-box';
+  score.innerHTML = `<strong>正解: ${questions.length} 点中 ${correctCount}点</strong><span>もう一度チャレンジしますか？</span>`;
+
+  elements.resultBox.innerHTML = '';
+  elements.resultBox.appendChild(score);
+
+  if (retakeButton) {
+    elements.resultBox.appendChild(retakeButton);
+  }
 }
