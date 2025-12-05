@@ -1,12 +1,12 @@
 {
-  "name": "JLPT Skill Sprint",
-  "short_name": "JLPT Sprint",
+  "name": "JLPTSHIKEN",
+  "short_name": "JLPTSHIKEN",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f7f2",
   "theme_color": "#0f766e",
-  "description": "日本語オンラインテストの練習をシンプルな体験で。",
+  "description": "JLPTSHIKENの練習をシンプルな体験で。",
   "icons": [
     {
       "src": "logo/icon-192.png",

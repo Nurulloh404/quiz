@@ -27,7 +27,7 @@ const liveRemainingElem = document.getElementById('live-remaining');
 window.onload = () => {
   if (startModal) startModal.style.display = 'flex';
   const title = document.getElementById('test-title');
-  if (title) title.textContent = `日本語オンラインテスト： ${subject}`;
+  if (title) title.textContent = `JLPTSHIKEN： ${subject}`;
 };
 
 document.addEventListener('DOMContentLoaded', () => {

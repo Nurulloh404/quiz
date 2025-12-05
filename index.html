@@ -7,18 +7,22 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <meta name="theme-color" content="#0f766e">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語の期末試験</title>
+    <title>JLPTSHIKEN | Home</title>
 <link rel="stylesheet" href="./style/style.css"/>
 </head>
 <body>
   <header>
     <div class="header">
       <div>
-        <span class="eyebrow">JLPT Skill Sprint</span>
-        <h1 class="test-title">日本語オンラインテスト</h1>
+        <span class="eyebrow">JLPTSHIKEN</span>
+        <h1 class="test-title">Mobil tayyorlov uchun JLPTSHIKEN</h1>
       </div>
       <div class="header-actions">
-        <a class="pill-link" href="mypage.html">My Page</a>
+        <nav class="nav-links">
+          <a class="pill-link" href="#n2-track">N2</a>
+          <a class="pill-link" href="#n3-track">N3</a>
+          <a class="pill-link" href="mypage.html">My Page</a>
+        </nav>
         <button id="toggle-theme">☀️</button>
       </div>
     </div>
@@ -26,13 +30,13 @@
 
   <main class="landing">
     <section class="hero">
-      <span class="eyebrow">Fresh Look</span>
-      <h1>Onlayn quiz bilan zamonaviy usulda tayyorlaning</h1>
-      <p>Natijalaringizni kuzating, to'g'ri javoblarni bir zumda ko'ring va My Page-da to'liq statistika bilan ishlang.</p>
+      <span class="eyebrow">Mobilga mos</span>
+      <h1>JLPTSHIKEN bilan minimal, dinamik tayyorlov</h1>
+      <p>Natijalaringizni kuzating, to'g'ri javoblarni darhol ko'ring va My Page-da barcha ko'rsatkichlarni nazorat qiling.</p>
       <div class="hero-actions">
-        <a class="btn" href="goi.html?subject=文字・語彙">Tez boshlash</a>
+        <a class="btn" href="n2goi.html?subject=文字・語彙">N2 tez boshlash</a>
         <a class="btn secondary" href="mypage.html">Statistikalar</a>
-        <a class="btn ghost" href="shikenIndex.html">Full Test</a>
+        <a class="btn ghost" href="n2shikenindex.html">N2 Full Test</a>
       </div>
       <div class="hero-metrics">
         <div class="metric">
@@ -51,19 +55,7 @@
     </section>
 
     <section class="level-grid">
-      <article class="level-card">
-        <h3>⊶ N3レベル ⊷</h3>
-        <small>Asosiy tayyorgarlikni shu yerdan boshlang</small>
-        <div class="link-list">
-          <a class="list-item" href="goi.html?subject=文字・語彙">文字・語彙テスト</a>
-          <a class="list-item" href="bunpou.html?subject=文法">文法テスト</a>
-          <a class="list-item" href="hoshi_mondai.html?subject=星問題">星問題テスト</a>
-          <a class="list-item" href="dokkai.html">読解テスト</a>
-          <a class="list-item" href="shikenIndex.html">試験テスト</a>
-        </div>
-      </article>
-
-      <article class="level-card">
+      <article class="level-card" id="n2-track">
         <h3>⊶ N2レベル ⊷</h3>
         <small>Murakkab savollar va vaqt boshqaruvi</small>
         <div class="link-list">
@@ -72,6 +64,18 @@
           <a class="list-item" href="n2hoshi_mondai.html?subject=星問題">星問題テスト</a>
           <a class="list-item" href="n2dokkai.html">読解テスト</a>
           <a class="list-item" href="n2shikenindex.html">試験テスト</a>
+        </div>
+      </article>
+
+      <article class="level-card" id="n3-track">
+        <h3>⊶ N3レベル ⊷</h3>
+        <small>Asosiy tayyorgarlikni shu yerdan boshlang</small>
+        <div class="link-list">
+          <a class="list-item" href="goi.html?subject=文字・語彙">文字・語彙テスト</a>
+          <a class="list-item" href="bunpou.html?subject=文法">文法テスト</a>
+          <a class="list-item" href="hoshi_mondai.html?subject=星問題">星問題テスト</a>
+          <a class="list-item" href="dokkai.html">読解テスト</a>
+          <a class="list-item" href="shikenIndex.html">試験テスト</a>
         </div>
       </article>
     </section>

@@ -28,7 +28,7 @@ const liveRemainingElem = document.getElementById('live-remaining');
 window.onload = () => {
   if (startModal) startModal.style.display = 'flex';
   const title = document.getElementById('test-title');
-  if (title) title.textContent = `日本語オンラインテスト： ${subject}`;
+  if (title) title.textContent = `JLPTSHIKEN： ${subject}`;
 };
 
 // テーマ切り替え
@@ -48,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeButton) themeButton.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.error('Service worker registration failed:', err);
+    });
+  }
 });
 
 // Начало теста
