@@ -46,6 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeButton) themeButton.textContent = isDark ? '☀️' : '🌙';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.error('Service worker registration failed:', err);
+    });
+  }
 });
 
 document.getElementById('start-test-btn')?.addEventListener('click', () => {
