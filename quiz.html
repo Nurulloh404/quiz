@@ -4,16 +4,18 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="./logo/ssr_logo.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JLPTSHIKEN | 文法</title>
-<link rel="stylesheet" href="./style/style.css" />
+  <title>JLPTSHIKEN | Quiz</title>
+  <link rel="stylesheet" href="./style/style.css" />
 </head>
-<body data-level="N3">
+<body data-level="N2">
 <header>
   <div class="header">
-    <h1 id="test-title" class="test-title">JLPTSHIKEN： 文法</h1>
+    <h1 id="test-title" class="test-title">JLPTSHIKEN</h1>
     <div class="header-actions">
-      <a class="pill-link" href="index.html">ホーム</a>
-      <a class="pill-link" href="mypage.html">My Page</a>
+      <nav class="nav-links">
+        <a class="pill-link" href="index.html">ホーム</a>
+        <a class="pill-link" href="mypage.html">My Page</a>
+      </nav>
       <button id="toggle-theme">☀️</button>
     </div>
   </div>
@@ -28,7 +30,7 @@
 
 <div class="container">
   <div class="page-intro">
-    <p class="muted">テスト終了後、正解は緑、選択した間違いは赤で表示されます。すべての履歴は My Page に保存されます。</p>
+    <p class="muted">Tayyorlovni boshlang: savollar tasodifiylashtiriladi, to'g'ri va noto'g'ri javoblar rang bilan ajratiladi. Natijalar My Page'da saqlanadi.</p>
   </div>
   <main id="questions-container"></main>
   <form id="quiz-form"></form>
@@ -46,12 +48,11 @@
   <div>⏳ <span id="live-remaining">0</span></div>
 </footer>
 
-<!-- ✅ Модальное окно: настройка теста -->
 <div id="start-settings-modal" class="modal-overlay">
   <div class="modal-content">
-    <h3 id="startTestBtn">テストの設定</h3>
+    <h3>テストの設定</h3>
     <label>問題の数:
-      <input type="number" id="question-count" min="1" max="200" value="20" />
+      <input type="number" id="question-count" min="1" max="525" value="20" />
     </label><br><br>
     <label>制限時間（分）:
       <input type="number" id="time-limit" min="1" max="180" value="60" />
@@ -61,7 +62,6 @@
   </div>
 </div>
 
-<!-- ✅ Подтверждение завершения -->
 <div id="confirm-end-modal" class="modal-overlay" style="display:none">
   <div class="modal-content">
     <p>テストを終了しますか。</p>
@@ -70,7 +70,6 @@
   </div>
 </div>
 
-<!-- ✅ Подтверждение выхода -->
 <div id="confirm-exit-modal" class="modal-overlay" style="display:none">
   <div class="modal-content">
     <p>メインメニューに戻りますか。</p>

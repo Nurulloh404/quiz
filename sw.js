@@ -4,6 +4,8 @@ const PRECACHE_ASSETS = [
   './index.html',
   './style/style.css',
   './js/script.js',
+  './json/questions.json',
+  './json/n2questions.json',
   './logo/icon-192.png',
   './logo/icon-512.png'
 ];

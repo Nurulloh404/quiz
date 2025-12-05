@@ -23,10 +23,22 @@ document.getElementById('clear-stats')?.addEventListener('click', () => {
   const ok = confirm('Barcha saqlangan natijalar o‘chiriladi. Davom etilsinmi?');
   if (!ok) return;
   localStorage.removeItem('quizResults');
+  clearMasteredProgress();
   results = [];
   renderStats();
   renderTable();
 });
+
+function clearMasteredProgress() {
+  const levels = ['N2', 'N3'];
+  const subjects = ['all', '文法', '文字・語彙', '星問題', '読解'];
+  levels.forEach(level => {
+    localStorage.removeItem(`jlptshiken_correct_${level}`);
+    subjects.forEach(sub => {
+      localStorage.removeItem(`jlptshiken_correct_${level}-${sub}`);
+    });
+  });
+}
 
 function loadResults() {
   try {

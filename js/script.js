@@ -1,7 +1,11 @@
-const QUESTION_FILE = './json/questions.json';
-const LEVEL = 'N3';
 const params = new URLSearchParams(window.location.search);
-const subject = params.get('subject') || '文法';
+const levelParam = (params.get('level') || '').toUpperCase();
+const bodyLevel = (document.body.dataset.level || '').toUpperCase();
+const LEVEL = levelParam || bodyLevel || 'N2';
+const QUESTION_FILE = LEVEL === 'N2' ? './json/n2questions.json' : './json/questions.json';
+const subject = params.get('subject') || document.body.dataset.subject || '文法';
+const SUBJECT_KEY = (subject || '').toLowerCase();
+const CORRECT_KEY = `jlptshiken_correct_${LEVEL}`;
 
 let questions = [];
 let questionPool = null;
@@ -13,6 +17,7 @@ let testStartedAt = null;
 let liveCorrect = 0;
 let liveIncorrect = 0;
 let questionStatus = [];
+let masteredSet = new Set();
 
 const startModal = document.getElementById('start-settings-modal');
 const resultBox = document.getElementById('result');
@@ -27,7 +32,7 @@ const liveRemainingElem = document.getElementById('live-remaining');
 window.onload = () => {
   if (startModal) startModal.style.display = 'flex';
   const title = document.getElementById('test-title');
-  if (title) title.textContent = `JLPTSHIKEN： ${subject}`;
+  if (title) title.textContent = `JLPTSHIKEN ${LEVEL}： ${subject}`;
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -118,9 +123,17 @@ function formatOption(opt) {
 
 async function beginTest(config) {
   resetUI();
+  masteredSet = loadMastered();
   const data = await loadQuestionPool();
-  const pool = data[subject] || [];
-  questions = shuffleArray([...pool]).slice(0, config.count);
+  const targetCount = (subject && subject.toLowerCase() === 'all') ? 20 : config.count;
+  const pool = buildPool(data, subject);
+  const untouched = pool.filter(q => !masteredSet.has(getQuestionId(q, subject)));
+  const primary = shuffleArray([...untouched]).slice(0, targetCount);
+  const fallback = primary.length < targetCount
+    ? shuffleArray([...pool.filter(q => !primary.includes(q))]).slice(0, targetCount - primary.length)
+    : [];
+
+  questions = [...primary, ...fallback].slice(0, targetCount);
   timeLeft = config.time * 60;
   testStartedAt = Date.now();
   liveCorrect = 0;
@@ -165,10 +178,47 @@ function startTimer() {
 }
 
 function shuffleArray(arr) {
-  return arr
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function buildPool(data, subjectName) {
+  if (!data) return [];
+  if (subjectName && subjectName.toLowerCase() === 'all') {
+    return Object.values(data).flat();
+  }
+  const pool = data[subjectName] || data[SUBJECT_KEY] || [];
+  return Array.isArray(pool) ? pool : [];
+}
+
+function getQuestionId(question, subjectName) {
+  const base = question.id || question.question || question.image || JSON.stringify(question);
+  return `${LEVEL}-${(subjectName || SUBJECT_KEY)}` + `-${base}`;
+}
+
+function loadMastered() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CORRECT_KEY) || '[]');
+    return new Set(parsed);
+  } catch {
+    return new Set();
+  }
+}
+
+function persistMastered() {
+  if (!questions.length) return;
+  const updated = new Set(masteredSet);
+  questions.forEach((q, idx) => {
+    if (questionStatus[idx] === 'correct') {
+      updated.add(getQuestionId(q, subject));
+    }
+  });
+  masteredSet = updated;
+  localStorage.setItem(CORRECT_KEY, JSON.stringify(Array.from(updated).slice(0, 2000)));
 }
 
 // Подтверждение завершения
@@ -242,6 +292,7 @@ function submitTest() {
 
   const durationSec = getDurationSeconds();
   const accuracy = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+  persistMastered();
   resultBox.innerHTML = '';
   answersReview.innerHTML = '';
   saveResult(correctCount, accuracy, durationSec);
@@ -342,6 +393,10 @@ function handleOptionSelect(event) {
 
   questionStatus[qIndex] = isCorrect ? 'correct' : 'incorrect';
   if (isCorrect) liveCorrect++; else liveIncorrect++;
+  if (isCorrect) {
+    masteredSet.add(getQuestionId(q, subject));
+    localStorage.setItem(CORRECT_KEY, JSON.stringify(Array.from(masteredSet).slice(0, 2000)));
+  }
   updateLiveFooter();
 
   options.forEach(opt => {

@@ -228,20 +228,14 @@ function showConfirm(text) {
     if (!modal) {
       modal = document.createElement("div");
       modal.id = "confirm-modal";
-      modal.style.position = "fixed";
-      modal.style.top = "0";
-      modal.style.left = "0";
-      modal.style.right = "0";
-      modal.style.bottom = "0";
-      modal.style.background = "rgba(0,0,0,0.6)";
-      modal.style.display = "flex";
-      modal.style.justifyContent = "center";
-      modal.style.alignItems = "center";
+      modal.className = "modal-overlay";
       modal.innerHTML = `
-        <div style="background: white; padding: 20px; border-radius: 10px; max-width: 300px; text-align: center;">
-          <p id="confirm-text" style="margin-bottom: 15px;"></p>
-          <button id="confirm-yes">はい</button>
-          <button id="confirm-no" style="margin-left: 10px;">いいえ</button>
+        <div class="modal-content">
+          <p id="confirm-text" style="margin-bottom: 12px;"></p>
+          <div class="button-row" style="justify-content:center; margin-top: 10px;">
+            <button id="confirm-yes">はい</button>
+            <button id="confirm-no" class="ghost">いいえ</button>
+          </div>
         </div>`;
       document.body.appendChild(modal);
     }
